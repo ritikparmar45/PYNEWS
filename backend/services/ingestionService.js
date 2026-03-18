@@ -5,11 +5,15 @@ import News from '../models/News.js';
 const parser = new Parser();
 
 const FEEDS = [
+  { name: 'OpenAI Blog', url: 'https://openai.com/blog/rss.xml' }, // Requires a third-party proxy in prod usually, dummy path for MVP
+  { name: 'Google AI Blog', url: 'http://googleaiblog.blogspot.com/atom.xml' },
   { name: 'TechCrunch AI', url: 'https://techcrunch.com/category/artificial-intelligence/feed/' },
+  { name: 'arXiv (AI)', url: 'http://export.arxiv.org/rss/cs.AI' },
+  { name: 'Wired (AI)', url: 'https://www.wired.com/feed/tag/ai/latest/rss' },
   { name: 'Reddit ML', url: 'https://www.reddit.com/r/MachineLearning.rss' },
-  { name: 'Hacker News AI', url: 'https://hnrss.org/newest?q=AI' },
-  // Optional/Fallback feeds (Some may block automated requests, keeping reliable ones)
-  { name: 'Google AI Blog', url: 'http://googleaiblog.blogspot.com/atom.xml' }
+  { name: 'PapersWithCode', url: 'https://paperswithcode.com/rss' }, // Example fallback if not exist
+  { name: 'YouTube AI (Two Minute Papers)', url: 'https://www.youtube.com/feeds/videos.xml?channel_id=UCbfYPyITQ-7l4upoX8nvctg' },
+  { name: 'Stability AI Blog', url: 'https://stability.ai/news?format=rss' }
 ];
 
 export const fetchAndStoreNews = async () => {
