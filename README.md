@@ -1,63 +1,79 @@
-# AI News Aggregation & Broadcasting Dashboard
+# PYNEWS: AI News Aggregation Dashboard
 
-A full-stack web application that automatically collects AI-related news from multiple RSS feeds, deduplicates them, and displays them in a modern dashboard. Users can mark news as favorites and simulate broadcasting via Email, LinkedIn, and WhatsApp.
+A full-stack news aggregation platform designed specifically for Artificial Intelligence updates. The application automates the ingestion of top AI RSS feeds, standardizes and deduplicates the data, and provides an interactive UI for saving and sharing key articles.
 
-## 🚀 Tech Stack
+---
 
-- **Frontend**: React (Vite), Tailwind CSS, React Router, Axios, Lucide React
-- **Backend**: Node.js, Express, Mongoose, rss-parser
-- **Database**: MongoDB
-- **Deployment**: Docker, Docker Compose
+## 🏗️ Architecture
 
-## 🛠️ Setup & Execution
+The project follows a standard decoupled **MERN** architecture. The codebase is organized as a monorepo containing two distinct modules:
+- `/backend`: Node.js/Express API with centralized business logic (controllers, models, services).
+- `/frontend`: Client-side React application managed via Vite with Tailwind CSS.
 
-The easiest way to run the application is using Docker.
+### Tech Stack
+- **Frontend Engine**: React 19, Vite, Tailwind CSS 3 
+- **Backend API**: Node.js 18+, Express.js 5
+- **Database**: MongoDB (via Mongoose)
+- **External Integrations**: `@google/generative-ai` (Gemini 1.5 Flash), `rss-parser`
 
-### Prerequisites
-- [Docker](https://docs.docker.com/get-docker/) & Docker Compose installed on your system.
+---
 
-### Running with Docker
+## ✨ Features
 
-1. Open your terminal in the project root directory.
-2. Run the following command:
-   ```bash
-   docker-compose up --build
-   ```
-3. Access the application:
-   - **Frontend**: http://localhost:5173
-   - **Backend API**: http://localhost:5000/api
+1. **AI LinkedIn Caption Generator** _(Core Requirement)_
+   - Integrates the Gemini API to analyze article contents and dynamically draft professional 3-sentence social media captions directly from the dashboard.
+2. **Automated News Ingestion**
+   - Headless background service built on `rss-parser` that fetches payloads from 9 major AI publications (TechCrunch, arXiv, PapersWithCode, Reddit ML, etc.).
+3. **Data Deduplication Engine**
+   - Prevents database bloating by verifying exact URL matches and performing case-insensitive title comparisons before insertion.
+4. **Favorites System**
+   - Click-to-save feature persistently storing articles to the database for subsequent reading.
+5. **Broadcast Simulation**
+   - Allows users to mock-broadcast articles to LinkedIn, WhatsApp, and Email. Action states are permanently recorded in a `BroadcastLog` schema.
 
-### Running Locally (Without Docker)
+---
 
-You will need an active MongoDB instance (e.g., `mongodb://localhost:27017/ai_news`).
+## 🛠️ Local Development Setup
 
-**Backend Setup:**
+> **Note**: For local development speed, the backend utilizes `mongodb-memory-server` if no `MONGO_URI` is provided. This allows zero-configuration execution without a local MongoDB service.
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/ritikparmar45/PYNEWS.git
+cd PYNEWS
+```
+
+### 2. Start the Backend Service
 ```bash
 cd backend
 npm install
 npm run dev
 ```
+The server will initialize on `http://localhost:5000`.
 
-**Frontend Setup:**
+### 3. Start the Frontend Client
+Open a second terminal window:
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
+The client will initialize on `http://localhost:5173`.
 
-## 🔌 API Endpoints
+---
 
-- `GET /api/news` - Fetch all ingested news articles.
-- `POST /api/news/fetch` - Trigger news ingestion from RSS feeds and store deduplicated records.
-- `POST /api/favorites` - Add a news article to your favorites list.
-- `GET /api/favorites` - Fetch all favorite articles.
-- `DELETE /api/favorites/:id` - Remove an article from favorites.
-- `POST /api/broadcast` - Simulate broadcasting an article to a specific platform.
+## 📡 Core API Reference
 
-## 📁 Architecture Overview
+| HTTP Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `GET` | `/api/news` | Retrieve the latest aggregated articles. |
+| `POST` | `/api/news/fetch` | Trigger the ingestion service to pull new RSS payloads. |
+| `POST` | `/api/favorites` | Bookmark an article ID to the user's favorites. |
+| `GET` | `/api/favorites` | Retrieve the user's bookmarked collection. |
+| `DELETE` | `/api/favorites/:id` | Remove a bookmarked article. |
+| `POST` | `/api/broadcast` | Log a platform broadcasting action. |
+| `POST` | `/api/ai/generate-caption` | Execute the Gemini model against an article ID. |
 
-- **Ingestion Service**: Uses `rss-parser` to periodically fetch or manually ingest news from top AI sources (TechCrunch, Hacker News, Reddit ML, etc.).
-- **Deduplication**: Before inserting an article into MongoDB, the backend checks if the URL or exact Title already exists in the `News` collection.
-- **Frontend Dashboard**: A responsive, card-structured UI allowing single-click Favorites and hover-to-share Broadcast simulations.
+---
 
-Enjoy curating AI News!
+*This project was engineered to demonstrate proficient full-stack capabilities, API building, and third-party data handling within a Node.js ecosystem.*

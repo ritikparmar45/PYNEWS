@@ -5,33 +5,31 @@ import Favorites from './pages/Favorites';
 function App() {
   return (
     <Router>
-      <div className="min-h-screen flex flex-col">
-        <nav className="bg-white shadow">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex justify-between h-16">
-              <div className="flex space-x-8">
-                <Link to="/" className="flex items-center space-x-2">
-                   <span className="font-bold text-xl text-brand-600">AI News Dashboard</span>
-                </Link>
-                <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-                  <Link to="/" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 border-b-2 border-transparent hover:border-gray-300">
-                    Home
-                  </Link>
-                  <Link to="/favorites" className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-500 border-b-2 border-transparent hover:border-gray-300">
-                    Favorites
-                  </Link>
-                </div>
-              </div>
-            </div>
+      <div style={{ fontFamily: 'sans-serif' }}>
+        
+        {/* Simple Navbar */}
+        <nav className="bg-blue-800 text-white p-4 items-center flex justify-between">
+          <Link to="/" className="text-xl font-bold hover:text-blue-200">
+            📊 PYNEWS App
+          </Link>
+          <div className="flex gap-4">
+            <Link to="/" className="hover:underline font-semibold">
+              Home
+            </Link>
+            <Link to="/favorites" className="hover:underline font-semibold">
+              Favorites
+            </Link>
           </div>
         </nav>
         
-        <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        {/* Main Content Area */}
+        <main className="max-w-6xl mx-auto p-4 bg-gray-50 min-h-screen">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/favorites" element={<Favorites />} />
           </Routes>
         </main>
+        
       </div>
     </Router>
   );
