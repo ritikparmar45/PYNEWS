@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import NewsCard from '../components/NewsCard';
+import { RefreshCw, Loader2 } from 'lucide-react';
 
 export default function Home() {
   const [news, setNews] = useState([]);
@@ -38,7 +39,7 @@ export default function Home() {
       await loadNews();
     } catch (error) {
       console.error(error);
-      showToast('Error fetching news from RSS');
+      showToast('Error syncing new articles');
     } finally {
       setFetching(false);
     }
@@ -47,10 +48,10 @@ export default function Home() {
   const handleFavorite = async (article) => {
     try {
       await api.post('/favorites', { newsId: article._id });
-      showToast('Successfully added to favorites!');
+      showToast('Added to favorites!');
     } catch (error) {
       if (error.response?.data?.message === 'News is already in favorites') {
-        showToast('This is already in your favorites');
+        showToast('Already in favorites');
       } else {
         showToast('Error adding favorite');
       }
@@ -60,45 +61,46 @@ export default function Home() {
   const handleBroadcast = async (newsId, platform) => {
     try {
       await api.post('/broadcast', { newsId, platform });
-      showToast(`Shared to ${platform} successfully!`);
+      showToast(`Broadcasted to ${platform} successfully!`);
     } catch (error) {
-      showToast('Failed to share');
+      showToast('Broadcast failed');
     }
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className="space-y-6">
       {toast && (
-        <div className="bg-green-100 text-green-800 p-3 mb-4 border border-green-300 rounded font-bold">
+        <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in-up">
           {toast}
         </div>
       )}
 
-      <div className="flex flex-col md:flex-row justify-between mb-6 border-b pb-4">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-black text-blue-900">Latest AI News Feeds</h1>
-          <p className="text-gray-600 mt-1">Get the newest articles about Artificial Intelligence here.</p>
+          <h1 className="text-3xl font-bold text-gray-900">Latest AI News</h1>
+          <p className="mt-2 text-sm text-gray-600">Discover the most recent developments in Artificial Intelligence.</p>
         </div>
         
         <button
           onClick={handleFetchLatest}
           disabled={fetching}
-          className="bg-blue-600 text-white px-5 py-2 mt-4 md:mt-0 font-bold rounded shadow hover:bg-blue-700 disabled:bg-gray-400"
+          className="inline-flex items-center px-4 py-2 bg-brand-600 text-white text-sm font-medium rounded-lg hover:bg-brand-700 disabled:opacity-50 transition-colors shadow-sm"
         >
-          {fetching ? '🔄 Loading news...' : '📥 Fetch Latest News'}
+          {fetching ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <RefreshCw className="w-4 h-4 mr-2" />}
+          {fetching ? 'Syncing...' : 'Fetch Latest News'}
         </button>
       </div>
 
       {loading ? (
-        <div className="text-center p-10 font-bold text-gray-500">
-          Loading news from database... please wait.
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-brand-600" />
         </div>
       ) : news.length === 0 ? (
-        <div className="bg-yellow-100 p-5 border border-yellow-300 text-center rounded">
-          <strong>No news found.</strong> Click "Fetch Latest News" above to load articles.
+        <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
+          <p className="text-gray-500">No news found. Click "Fetch Latest News" to populate the dashboard.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {news.map((item) => (
             <NewsCard 
               key={item._id} 

@@ -1,14 +1,16 @@
 import { useState } from 'react';
+import { ExternalLink, Heart, Share2, Sparkles, Loader2 } from 'lucide-react';
 import api from '../api/axios';
 
 export default function NewsCard({ article, onFavorite, onBroadcast, isFavoriteView, onRemoveFavorite }) {
+  const [broadcasting, setBroadcasting] = useState(false);
   const [aiCaption, setAiCaption] = useState(null);
   const [generatingAi, setGeneratingAi] = useState(false);
 
   const handleBroadcast = (platform) => {
+    setBroadcasting(true);
     onBroadcast(article._id, platform);
-    // Student style alert
-    alert(`Article shared to ${platform}!`);
+    setTimeout(() => setBroadcasting(false), 500); // UI feel
   };
 
   const handleGenerateAiCaption = async () => {
@@ -24,63 +26,108 @@ export default function NewsCard({ article, onFavorite, onBroadcast, isFavoriteV
   };
 
   return (
-    <div className="bg-white border text-left border-gray-300 p-4 mb-4 rounded-md shadow">
-      
-      <div className="flex justify-between border-b pb-2 mb-2">
-        <span className="bg-blue-100 text-blue-800 font-bold px-2 py-1 text-sm rounded">
-          📁 {article.source}
-        </span>
-        <span className="text-sm text-gray-500 font-medium">
-          📅 {new Date(article.publishedAt).toLocaleDateString()}
-        </span>
-      </div>
-      
-      <h3 className="text-xl font-bold mb-2 text-gray-800">
-        {article.title}
-      </h3>
-      
-      <p className="text-gray-700 mb-4 text-sm leading-relaxed">
-        {article.summary || "No summary provided by the news source. Please click the link to read more."}
-      </p>
-
-      {/* AI Box */}
-      {aiCaption && (
-        <div className="bg-purple-100 p-3 mb-4 rounded border border-purple-300">
-          <strong className="text-purple-900 block mb-1">🤖 AI LinkedIn Caption:</strong>
-          <p className="text-purple-800 whitespace-pre-line text-sm">{aiCaption}</p>
+    <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-300 overflow-hidden flex flex-col h-full border border-gray-100">
+      <div className="p-5 flex-1 flex flex-col">
+        <div className="flex justify-between items-start mb-2">
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-brand-100 text-brand-800">
+            {article.source}
+          </span>
+          <span className="text-xs text-gray-500">
+            {new Date(article.publishedAt).toLocaleDateString()}
+          </span>
         </div>
-      )}
-
-      {/* Buttons Area */}
-      <div className="flex flex-wrap gap-2 mt-2">
-        <a href={article.url} target="_blank" rel="noopener noreferrer" className="bg-gray-200 text-black px-3 py-1.5 rounded hover:bg-gray-300 text-sm font-medium">
-          🔗 Read Article
-        </a>
         
-        <button onClick={handleGenerateAiCaption} disabled={generatingAi} className="bg-purple-600 text-white px-3 py-1.5 rounded hover:bg-purple-700 text-sm font-medium">
-          {generatingAi ? "⏳ Generating..." : "✨ AI Caption"}
-        </button>
+        <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
+          {article.title}
+        </h3>
+        
+        <p className="text-sm text-gray-600 mb-4 line-clamp-3 flex-1">
+          {article.summary || "No summary provided by the source."}
+        </p>
 
-        {!isFavoriteView ? (
-          <button onClick={() => onFavorite(article)} className="bg-red-500 text-white px-3 py-1.5 rounded hover:bg-red-600 text-sm font-medium">
-            ❤️ Save News
-          </button>
-        ) : (
-          <button onClick={() => onRemoveFavorite(article._id)} className="bg-red-100 text-red-800 border border-red-300 px-3 py-1.5 rounded text-sm font-medium hover:bg-red-200">
-            ❌ Remove 
-          </button>
+        {/* AI Caption Display Area */}
+        {aiCaption && (
+          <div className="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-900">
+            <span className="block font-semibold mb-1 flex items-center">
+              <Sparkles className="w-3 h-3 mr-1 text-purple-600" /> AI Suggested Caption:
+            </span>
+            <p className="whitespace-pre-line">{aiCaption}</p>
+          </div>
         )}
-      </div>
 
-      <div className="mt-3 bg-gray-50 p-2 rounded border">
-        <span className="text-xs font-bold text-gray-500 mr-2">SHARE TO:</span>
-        <div className="inline-flex gap-2">
-          <button onClick={() => handleBroadcast('linkedin')} className="bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold">LinkedIn</button>
-          <button onClick={() => handleBroadcast('whatsapp')} className="bg-green-500 text-white px-2 py-1 rounded text-xs font-semibold">WhatsApp</button>
-          <button onClick={() => handleBroadcast('email')} className="bg-gray-600 text-white px-2 py-1 rounded text-xs font-semibold">Email</button>
+        <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+          <a
+            href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center text-sm font-medium text-brand-600 hover:text-brand-500"
+          >
+            Read More <ExternalLink className="ml-1 w-4 h-4" />
+          </a>
+          
+          <div className="flex space-x-2">
+            
+            <button
+              onClick={handleGenerateAiCaption}
+              disabled={generatingAi}
+              className="p-2 text-gray-400 hover:text-purple-500 transition-colors tooltip disabled:opacity-50"
+              title="Generate AI LinkedIn Caption"
+            >
+              {generatingAi ? <Loader2 className="w-5 h-5 animate-spin text-purple-500" /> : <Sparkles className="w-5 h-5 hover:fill-purple-100" />}
+            </button>
+
+            {!isFavoriteView && (
+              <button
+                onClick={() => onFavorite(article)}
+                className="p-2 text-gray-400 hover:text-red-500 transition-colors tooltip"
+                title="Add to Favorites"
+              >
+                <Heart className="w-5 h-5" />
+              </button>
+            )}
+            
+            {isFavoriteView && (
+               <button
+                 onClick={() => onRemoveFavorite(article._id)}
+                 className="p-2 text-red-500 hover:text-red-600 transition-colors tooltip"
+                 title="Remove from Favorites"
+               >
+                 <Heart className="w-5 h-5 fill-current" />
+               </button>
+            )}
+
+            <div className="relative group/share">
+              <button className="p-2 text-gray-400 hover:text-blue-500 transition-colors">
+                <Share2 className="w-5 h-5" />
+              </button>
+              
+              <div className="absolute bottom-full right-0 mb-2 w-32 bg-white rounded-lg shadow-lg border border-gray-100 invisible group-hover/share:visible transition-all z-10 p-1 flex flex-col gap-1">
+                <button 
+                  onClick={() => handleBroadcast('linkedin')}
+                  disabled={broadcasting}
+                  className="text-left text-xs px-3 py-2 hover:bg-gray-50 rounded text-gray-700"
+                >
+                  LinkedIn
+                </button>
+                <button 
+                  onClick={() => handleBroadcast('whatsapp')}
+                  disabled={broadcasting}
+                  className="text-left text-xs px-3 py-2 hover:bg-gray-50 rounded text-gray-700"
+                >
+                  WhatsApp
+                </button>
+                <button 
+                  onClick={() => handleBroadcast('email')}
+                  disabled={broadcasting}
+                  className="text-left text-xs px-3 py-2 hover:bg-gray-50 rounded text-gray-700"
+                >
+                  Email
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
   );
 }

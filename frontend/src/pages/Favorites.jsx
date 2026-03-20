@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '../api/axios';
 import NewsCard from '../components/NewsCard';
+import { Loader2 } from 'lucide-react';
 
 export default function Favorites() {
   const [favorites, setFavorites] = useState([]);
@@ -42,35 +43,35 @@ export default function Favorites() {
   const handleBroadcast = async (newsId, platform) => {
     try {
       await api.post('/broadcast', { newsId, platform });
-      showToast(`Shared to ${platform} successfully!`);
+      showToast(`Broadcasted to ${platform} successfully!`);
     } catch (error) {
-      showToast('Failed to share');
+      showToast('Broadcast failed');
     }
   };
 
   return (
-    <div style={{ padding: '20px' }}>
+    <div className="space-y-6">
       {toast && (
-        <div className="bg-green-100 text-green-800 p-3 mb-4 border border-green-300 rounded font-bold">
+        <div className="fixed bottom-4 right-4 bg-gray-900 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in-up">
           {toast}
         </div>
       )}
 
-      <div className="border-b pb-4 mb-6">
-        <h1 className="text-3xl font-black text-blue-900">My Saved News</h1>
-        <p className="text-gray-600 mt-1">Articles you have saved to read later.</p>
+      <div>
+        <h1 className="text-3xl font-bold text-gray-900">Starred AI News</h1>
+        <p className="mt-2 text-sm text-gray-600">Your curated collection of important articles for future reference and sharing.</p>
       </div>
 
       {loading ? (
-        <div className="text-center p-10 font-bold text-gray-500">
-          Loading your favorite news... please wait.
+        <div className="flex justify-center items-center h-64">
+          <Loader2 className="w-8 h-8 animate-spin text-brand-600" />
         </div>
       ) : favorites.length === 0 ? (
-        <div className="bg-yellow-100 p-5 border border-yellow-300 text-center rounded">
-          <strong>No favorites found.</strong> Go to the Home page to save some news!
+        <div className="text-center py-12 bg-white rounded-xl shadow-sm border border-gray-100">
+          <p className="text-gray-500">You haven't favored any news yet.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {favorites.map((item) => {
             if (!item.newsId) return null;
             return (
