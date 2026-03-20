@@ -1,13 +1,28 @@
 import { useState } from 'react';
-import { ExternalLink, Heart, Share2 } from 'lucide-react';
+import { ExternalLink, Heart, Share2, Sparkles, Loader2 } from 'lucide-react';
+import api from '../api/axios';
 
 export default function NewsCard({ article, onFavorite, onBroadcast, isFavoriteView, onRemoveFavorite }) {
   const [broadcasting, setBroadcasting] = useState(false);
+  const [aiCaption, setAiCaption] = useState(null);
+  const [generatingAi, setGeneratingAi] = useState(false);
 
   const handleBroadcast = (platform) => {
     setBroadcasting(true);
     onBroadcast(article._id, platform);
     setTimeout(() => setBroadcasting(false), 500); // UI feel
+  };
+
+  const handleGenerateAiCaption = async () => {
+    try {
+      setGeneratingAi(true);
+      const res = await api.post('/ai/generate-caption', { newsId: article._id });
+      setAiCaption(res.data.caption);
+    } catch (error) {
+      alert('Failed to generate AI caption');
+    } finally {
+      setGeneratingAi(false);
+    }
   };
 
   return (
@@ -30,6 +45,16 @@ export default function NewsCard({ article, onFavorite, onBroadcast, isFavoriteV
           {article.summary || "No summary provided by the source."}
         </p>
 
+        {/* AI Caption Display Area */}
+        {aiCaption && (
+          <div className="mb-4 p-3 bg-purple-50 rounded-lg border border-purple-100 text-sm text-purple-900">
+            <span className="block font-semibold mb-1 flex items-center">
+              <Sparkles className="w-3 h-3 mr-1 text-purple-600" /> AI Suggested Caption:
+            </span>
+            <p className="whitespace-pre-line">{aiCaption}</p>
+          </div>
+        )}
+
         <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
           <a
             href={article.url}
@@ -41,6 +66,16 @@ export default function NewsCard({ article, onFavorite, onBroadcast, isFavoriteV
           </a>
           
           <div className="flex space-x-2">
+            
+            <button
+              onClick={handleGenerateAiCaption}
+              disabled={generatingAi}
+              className="p-2 text-gray-400 hover:text-purple-500 transition-colors tooltip disabled:opacity-50"
+              title="Generate AI LinkedIn Caption"
+            >
+              {generatingAi ? <Loader2 className="w-5 h-5 animate-spin text-purple-500" /> : <Sparkles className="w-5 h-5 hover:fill-purple-100" />}
+            </button>
+
             {!isFavoriteView && (
               <button
                 onClick={() => onFavorite(article)}

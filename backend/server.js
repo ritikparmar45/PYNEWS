@@ -17,11 +17,13 @@ app.use(express.json());
 import newsRoutes from './routes/newsRoutes.js';
 import favoriteRoutes from './routes/favoriteRoutes.js';
 import broadcastRoutes from './routes/broadcastRoutes.js';
+import aiRoutes from './routes/aiRoutes.js';
 
 // Routes
 app.use('/api/news', newsRoutes);
 app.use('/api/favorites', favoriteRoutes);
 app.use('/api/broadcast', broadcastRoutes);
+app.use('/api/ai', aiRoutes);
 
 app.get('/', (req, res) => {
   res.send('API is running...');
